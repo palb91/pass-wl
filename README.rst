@@ -37,7 +37,7 @@ I mostly use it with qutebrowser_. Qutebrowser has a userscript called
 qute-pass_ that does the same thing but using the builtin `fake-key` command
 that is logged (run `$ qutebrowser -l vdebug` to check).
 
-I set up qutebrowser as follow:
+I set up qutebrowser as follow (`pass-wl` should be in your `$PATH`):
 
 .. code:: python
 
@@ -45,9 +45,11 @@ I set up qutebrowser as follow:
     config.bind('<Alt-p>', 'mode-enter insert ;; spawn -- pass-wl {url}')
     config.bind('<Alt-u>', 'mode-enter insert ;; spawn -- pass-wl -u {url}')
     config.bind('<Alt-l>', 'mode-enter insert ;; spawn -- pass-wl -b {url}')
+    config.bind('<Alt-o>', 'mode-enter insert ;; spawn -- pass-wl -o {url}')
     config.bind('<Alt-p>', 'spawn -- pass-wl    {url}', mode='insert')
     config.bind('<Alt-u>', 'spawn -- pass-wl -u {url}', mode='insert')
     config.bind('<Alt-l>', 'spawn -- pass-wl -b {url}', mode='insert')
+    config.bind('<Alt-o>', 'spawn -- pass-wl -o {url}', mode='insert')
 
 
 .. _qutebrowser:  https://github.com/qutebrowser/qutebrowser
