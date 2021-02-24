@@ -1,0 +1,161 @@
+#!/bin/bash
+#
+# 2021 © palb91 (Pierre-Albéric TROUPLIN)
+
+
+# Environments
+declare -A content
+
+cmd=wtype
+asset=pass
+url=
+selection=
+
+
+# Utils
+help() {
+    cat <<HELP
+Type a password from password-store in a Wayland environment.
+
+Usage:
+    ${0##*/} [-h]
+    ${0##*/} [-u|-b|-o] [URL]
+    ${0##*/} -c [-u|-o] [URL]
+
+Options:
+    -u, --user  Type the username instead of the password.
+    -b, --both  Type the username and the password separated by a <Tab>.
+    -o, --otp   Type the otp code if exists.
+    -c, --copy  Copy instead of type.
+    -h, --help  Print this help.
+
+Argument:
+    URL         If any, must be the last parameter. ${0##*/} will try to
+                find only matching values from \`pass\`.
+HELP
+
+    exit "${1:-0}"
+}
+
+log()       { printf '%s\n'   "${*}" >&2; exit 1;                           }
+die()       { printf '%s\n\n' "${*}" >&2; help 1;                           }
+check_dep() { [[ -n "$(command -v "${1}")" ]] || log "${1} not installed";  }
+menu()      { check_dep bemenu; bemenu --prompt "${1:-${0##*/}}" | head -1; }
+
+
+# Parse arguments, check dependancies
+parse_args() {
+    while [[ "${#}" -gt 0 ]]; do
+        case "${1}" in
+            -h|--help) help                     ;;
+            -c|--copy) cmd=wl-copy              ;;
+            -u|--user) asset=user               ;;
+            -b|--both) asset=both               ;;
+            -o|--otp)  asset=otp                ;;
+            -*)        die "Wrong option: ${1}" ;;
+            *)         url="${1}"; break        ;;
+        esac
+
+        shift
+    done
+
+    [[ "${#}" -gt 1 ]] \
+        && die "Wrong number of arguments."
+
+    [[ "${cmd}" = 'wl-copy' ]] && [[ "${asset}" = 'both' ]] \
+        && die 'Cannot copy both username and password.'
+
+    check_dep "${cmd}"
+}
+
+
+# Set $pass_list with the password-store values
+get_pass_list() {
+    local _store="${PASSWORD_STORE_DIR:-${HOME}/.password-store}"
+    pass_list=( "${_store}"/**/*.gpg         )
+    pass_list=( "${pass_list[@]%.gpg}"       )
+    pass_list=( "${pass_list[@]#${_store}/}" )
+}
+
+
+# Select a single value (use a menu if a choice has to be made).
+filter_list() {
+    local _url _name _tmp
+    declare -a _match
+
+    if [[ -n "${url}" ]]; then
+        _url="${url#*://}"
+        _url="${_url%%/*}"
+
+        # Get matching pass values, check (sub)domains from the right.
+        for _name in "${pass_list[@]}"; do
+            _tmp="${_url%${_name##*/}}"
+            [[ "${_tmp}" != "${_url}" ]] || continue
+            # Has more subdomains than the pass entry (separated with a dot):
+            [[ -n "${_tmp}" ]] && [[ "${_tmp: -1}" != '.' ]] && continue
+            _match+=( "${_name}" )
+        done
+    fi
+
+    printf '> %s\n' "${#_match[@]}"
+
+    case "${#_match[@]}" in
+        0) _match=( "${pass_list[@]}" )     ;;
+        1) selection="${_match[0]}"; return ;;
+    esac
+
+    selection="$(printf '%s\n' "${_match[@]}" | menu 'select:')"
+
+    [[ -n "${selection}" ]] || log 'No selection... abort.'
+}
+
+
+# Get the content of the pass entry selected
+get_pass_content() {
+    shopt -s nocasematch
+
+    while read -r line; do
+        [[ -z "${content[pass]}" ]]                       \
+            && content[pass]="${line}"                    \
+            && continue
+
+        [[ -z "${content[user]}" ]]                       \
+            && [[ "${line}" =~ ^user(name)?: ]]           \
+            && content[user]="${line}"                    \
+            && continue
+
+        [[ -z "${content[otp]}" ]]                        \
+            && [[ "${line}" =~ ^otpauth:// ]]             \
+            && content[otp]="$(pass otp "${selection}")"  \
+            && continue
+    done < <(pass "${selection}")
+}
+
+
+# Run wtype or wl-copy with asked content
+type_or_copy() {
+    local _args
+
+    if [[ "${cmd}" = 'wtype' ]]; then
+        # Add a short delay before typing
+        set -- -s 300
+
+        [[ "${asset}" = 'both' ]] \
+            && content[both]="${content[user]} -k Tab ${content[pass]}"
+    fi
+
+    _args="${content[${asset}]}"
+
+    exec "${cmd}" "${_args[@]}"
+}
+
+
+main() {
+    parse_args "${@}"
+    get_pass_list
+    filter_list
+    get_pass_content
+    type_or_copy
+}
+
+main "${@}"
