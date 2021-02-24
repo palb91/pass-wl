@@ -121,7 +121,7 @@ get_pass_content() {
 
         [[ -z "${content[user]}" ]]                       \
             && [[ "${line}" =~ ^user(name)?: ]]           \
-            && content[user]="${line}"                    \
+            && content[user]="${line#*: }"                \
             && continue
 
         [[ -z "${content[otp]}" ]]                        \
