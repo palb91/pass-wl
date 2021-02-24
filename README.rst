@@ -42,12 +42,12 @@ I set up qutebrowser as follow:
 .. code:: python
 
     # in config.py
-    config.bind('<Alt-p>', 'mode-enter insert ;; spawn -u -- pass-wl {url}')
-    config.bind('<Alt-u>', 'mode-enter insert ;; spawn -u -- pass-wl -u {url}')
-    config.bind('<Alt-l>', 'mode-enter insert ;; spawn -u -- pass-wl -b {url}')
-    config.bind('<Alt-p>', 'spawn -u -- pass-wl    {url}', mode='insert')
-    config.bind('<Alt-u>', 'spawn -u -- pass-wl -u {url}', mode='insert')
-    config.bind('<Alt-l>', 'spawn -u -- pass-wl -b {url}', mode='insert')
+    config.bind('<Alt-p>', 'mode-enter insert ;; spawn -- pass-wl {url}')
+    config.bind('<Alt-u>', 'mode-enter insert ;; spawn -- pass-wl -u {url}')
+    config.bind('<Alt-l>', 'mode-enter insert ;; spawn -- pass-wl -b {url}')
+    config.bind('<Alt-p>', 'spawn -- pass-wl    {url}', mode='insert')
+    config.bind('<Alt-u>', 'spawn -- pass-wl -u {url}', mode='insert')
+    config.bind('<Alt-l>', 'spawn -- pass-wl -b {url}', mode='insert')
 
 
 .. _qutebrowser:  https://github.com/qutebrowser/qutebrowser
