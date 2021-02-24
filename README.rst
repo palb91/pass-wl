@@ -4,11 +4,11 @@
     :Author:       palb91
     :License:      MIT
     :Description:  Type a password from password-store in a Wayland environment
-    :Dependancies: - `pass <https://www.passwordstore.org/>`_;
-                   - `pass-otp <https://github.com/tadfisher/pass-otp>`_;
-                   - `wtype <https://github.com/atx/wtype>`_;
-                   - `bemenu <https://github.com/Cloudef/bemenu>`_;
-                   - `wl-clipboard <https://github.com/bugaevc/wl-clipboard>`_;
+    :Dependancies: - pass_;
+                   - pass-otp_ (optional);
+                   - wtype_;
+                   - bemenu_;
+                   - wl-clipboard_ (optional).
 
 ::
 
@@ -37,9 +37,6 @@ I mostly use it with qutebrowser_. Qutebrowser has a userscript called
 qute-pass_ that does the same thing but using the builtin `fake-key` command
 that is logged (run `$ qutebrowser -l vdebug` to check).
 
-.. _qutebrowser: https://github.com/qutebrowser/qutebrowser
-.. _qute-pass:   https://github.com/qutebrowser/qutebrowser/blob/master/misc/userscripts/qute-pass
-
 I set up qutebrowser as follow:
 
 .. code:: python
@@ -51,3 +48,12 @@ I set up qutebrowser as follow:
     config.bind('<Alt-p>', 'spawn -u -- pass-wl    {url}', mode='insert')
     config.bind('<Alt-u>', 'spawn -u -- pass-wl -u {url}', mode='insert')
     config.bind('<Alt-l>', 'spawn -u -- pass-wl -b {url}', mode='insert')
+
+
+.. _qutebrowser:  https://github.com/qutebrowser/qutebrowser
+.. _qute-pass:    https://github.com/qutebrowser/qutebrowser/blob/master/misc/userscripts/qute-pass
+.. _pass:         https://www.passwordstore.org/
+.. _pass-otp:     https://github.com/tadfisher/pass-otp
+.. _wtype:        https://github.com/atx/wtype
+.. _bemenu:       https://github.com/Cloudef/bemenu
+.. _wl-clipboard: https://github.com/bugaevc/wl-clipboard
