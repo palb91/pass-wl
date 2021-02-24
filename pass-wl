@@ -134,19 +134,17 @@ get_pass_content() {
 
 # Run wtype or wl-copy with asked content
 type_or_copy() {
-    local _args
+    set -- "${content[${asset}]}"
 
     if [[ "${cmd}" = 'wtype' ]]; then
-        # Add a short delay before typing
-        set -- -s 300
-
         [[ "${asset}" = 'both' ]] \
-            && content[both]="${content[user]} -k Tab ${content[pass]}"
+            && set -- "${content[user]}" -k Tab "${content[pass]}"
+
+        # Add a short delay before typing
+        set -- -s 150 "${@}"
     fi
 
-    _args="${content[${asset}]}"
-
-    exec "${cmd}" "${_args[@]}"
+    exec "${cmd}" "${@}"
 }
 
 
