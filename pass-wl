@@ -52,6 +52,8 @@ parse_args() {
             -u|--user) asset=user               ;;
             -b|--both) asset=both               ;;
             -o|--otp)  asset=otp                ;;
+            -cu)       cmd=wl-copy asset=user   ;;
+            -co)       cmd=wl-copy asset=otp    ;;
             -*)        die "Wrong option: ${1}" ;;
             *)         url="${1}"; break        ;;
         esac
