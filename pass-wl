@@ -2,6 +2,8 @@
 #
 # © 2021, Pierre-Albéric TROUPLIN (palb91)
 
+set -e
+
 
 # Environments
 declare -A content
@@ -73,6 +75,8 @@ parse_args() {
 
 # Set $pass_list with the password-store values
 get_pass_list() {
+    shopt -s globstar
+
     local _store="${PASSWORD_STORE_DIR:-${HOME}/.password-store}"
     pass_list=( "${_store}"/**/*.gpg         )
     pass_list=( "${pass_list[@]%.gpg}"       )
@@ -98,8 +102,6 @@ filter_list() {
             _match+=( "${_name}" )
         done
     fi
-
-    printf '> %s\n' "${#_match[@]}"
 
     case "${#_match[@]}" in
         0) _match=( "${pass_list[@]}" )     ;;
